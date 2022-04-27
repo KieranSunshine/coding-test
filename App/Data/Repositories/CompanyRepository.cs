@@ -6,7 +6,12 @@ using App.Model.Enums;
 
 namespace App.Data.Repositories
 {
-    public class CompanyRepository
+    public interface ICompanyRepository
+    {
+        Company GetById(int id);
+    }
+    
+    public class CompanyRepository : ICompanyRepository
     {
         public Company GetById(int id)
         {

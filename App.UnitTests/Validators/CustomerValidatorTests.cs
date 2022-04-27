@@ -1,5 +1,7 @@
 ﻿using System;
+using App.Calculators;
 using App.Validators;
+using Moq;
 using NUnit.Framework;
 
 namespace App.UnitTests.Validators
@@ -13,7 +15,7 @@ namespace App.UnitTests.Validators
         [Parallelizable]
         public void ValidateNamesThrowsArgumentNullExceptionOnNullArray()
         {
-            var validator = new CustomerValidator();
+            var validator = CreateValidatorInstance();
 
             Assert.Throws<ArgumentNullException>(() => validator.ValidateNames(null));
         }
@@ -22,7 +24,7 @@ namespace App.UnitTests.Validators
         [Parallelizable]
         public void ValidateNamesThrowsOutOfRangeExceptionOnEmptyArray()
         {
-            var validator = new CustomerValidator();
+            var validator = CreateValidatorInstance();
 
             Assert.Throws<ArgumentOutOfRangeException>(() => validator.ValidateNames());
         }
@@ -31,7 +33,7 @@ namespace App.UnitTests.Validators
         [Parallelizable]
         public void ValidateNamesReturnsTrueForValidNames()
         {
-            var validator = new CustomerValidator();
+            var validator = CreateValidatorInstance();
 
             var result = validator.ValidateNames("John", "Doe");
             
@@ -42,7 +44,7 @@ namespace App.UnitTests.Validators
         [Parallelizable]
         public void ValidateNamesReturnsFalseForInvalidNames()
         {
-            var validator = new CustomerValidator();
+            var validator = CreateValidatorInstance();
 
             var result = validator.ValidateNames("John", null);
             
@@ -57,7 +59,7 @@ namespace App.UnitTests.Validators
         [Parallelizable]
         public void ValidateEmailReturnsFalseForNull()
         {
-            var validator = new CustomerValidator();
+            var validator = CreateValidatorInstance();
 
             var result = validator.ValidateEmail(null);
             
@@ -68,7 +70,7 @@ namespace App.UnitTests.Validators
         [Parallelizable]
         public void ValidateEmailReturnsFalseForEmptyString()
         {
-            var validator = new CustomerValidator();
+            var validator = CreateValidatorInstance();
 
             var result = validator.ValidateEmail(string.Empty);
             
@@ -79,7 +81,7 @@ namespace App.UnitTests.Validators
         [Parallelizable]
         public void ValidateEmailReturnsFalseForInvalidEmail()
         {
-            var validator = new CustomerValidator();
+            var validator = CreateValidatorInstance();
 
             var result = validator.ValidateEmail("not_an_email");
             
@@ -90,7 +92,7 @@ namespace App.UnitTests.Validators
         [Parallelizable]
         public void ValidateEmailReturnsTrueForValidEmail()
         {
-            var validator = new CustomerValidator();
+            var validator = CreateValidatorInstance();
 
             var result = validator.ValidateEmail("john.doe@email.com");
             
@@ -98,5 +100,59 @@ namespace App.UnitTests.Validators
         }
         
         #endregion
+
+        #region MyRegion
+
+        [Test]
+        [Parallelizable]
+        public void ValidateAgeCallsCalculateAge()
+        {
+            var stubbedAge = new DateTime(1990, 1, 1);
+            var mockAgeCalculator = new Mock<IAgeCalculator>();
+            
+            mockAgeCalculator
+                .Setup(m => m.CalculateAge(It.IsAny<DateTime>()))
+                .Returns(30)
+                .Verifiable();
+
+            var validator = CreateValidatorInstance(mockAgeCalculator);
+            validator.ValidateAge(stubbedAge);
+            
+            mockAgeCalculator.Verify();
+        }
+
+        [Test]
+        [Parallelizable]
+        public void ValidateAgeReturnsTrueForValidAge()
+        {
+            var stubbedAge = new DateTime(1990, 1, 1);
+            var mockAgeCalculator = new Mock<IAgeCalculator>();
+            
+            mockAgeCalculator
+                .Setup(m => m.CalculateAge(It.IsAny<DateTime>()))
+                .Returns(30);
+
+            var validator = CreateValidatorInstance(mockAgeCalculator);
+            var result = validator.ValidateAge(stubbedAge);
+            
+            Assert.IsTrue(result);
+        }
+        
+        // TODO: Test for false cases.
+
+        #endregion
+
+        private static CustomerValidator CreateValidatorInstance()
+        {
+            var mockAgeCalculator = new Mock<IAgeCalculator>();
+            
+            return new CustomerValidator(mockAgeCalculator.Object);
+        }
+
+        private CustomerValidator CreateValidatorInstance(IMock<IAgeCalculator> mockAgeCalculator)
+        {
+            return new CustomerValidator(mockAgeCalculator.Object);
+        }
+
     }
 }

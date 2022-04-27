@@ -1,4 +1,4 @@
-namespace App
+namespace App.Model.Enums
 {
     public enum Classification
     {

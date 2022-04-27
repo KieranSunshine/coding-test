@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using App.Data;
+using App.Data.Repositories;
+using App.Model;
 
-namespace App
+namespace App.Services
 {
     public class CustomerService
     {

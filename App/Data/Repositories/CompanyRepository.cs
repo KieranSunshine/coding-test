@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
+﻿using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
+using App.Model;
+using App.Model.Enums;
 
-namespace App
+namespace App.Data.Repositories
 {
     public class CompanyRepository
     {

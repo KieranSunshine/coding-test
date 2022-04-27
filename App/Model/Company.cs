@@ -1,4 +1,6 @@
-namespace App
+using App.Model.Enums;
+
+namespace App.Model
 {
     public class Company
     {

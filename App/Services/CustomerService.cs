@@ -2,17 +2,22 @@
 using App.Data;
 using App.Data.Repositories;
 using App.Model;
+using App.Providers;
 using App.Validators;
 
 namespace App.Services
 {
     public class CustomerService
     {
-        private ICustomerValidator _customerValidator;
+        private readonly ICustomerValidator _customerValidator;
+        private IDateTimeProvider _dateTimeProvider;
 
-        public CustomerService(ICustomerValidator customerValidator)
+        public CustomerService(
+            ICustomerValidator customerValidator,
+            IDateTimeProvider dateTimeProvider)
         {
             _customerValidator = customerValidator;
+            _dateTimeProvider = dateTimeProvider;
         }
 
         public bool AddCustomer(string firstName, string surname, string email, DateTime dateOfBirth, int companyId)
@@ -20,7 +25,7 @@ namespace App.Services
             if (!_customerValidator.ValidateNames(firstName, surname) || !_customerValidator.ValidateEmail(email))
                 return false;
 
-            var now = DateTime.Now;
+            var now = _dateTimeProvider.Now();
             int age = now.Year - dateOfBirth.Year;
             if (now.Month < dateOfBirth.Month || (now.Month == dateOfBirth.Month && now.Day < dateOfBirth.Day)) age--;
 
